@@ -87,7 +87,7 @@ export function PunchForm({
       </label>
       <label>
         <span className="label">Owner</span>
-        <input name="owner" className="field" placeholder="M. Chen (CxA)" />
+        <input name="owner" required className="field" placeholder="Name / trade — e.g. Chen (CxA)" />
       </label>
       <label>
         <span className="label">Due date</span>

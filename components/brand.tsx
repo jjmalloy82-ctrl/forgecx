@@ -10,10 +10,13 @@ export function Wordmark({ className = "" }: { className?: string }) {
 
 export function LogoMark({ size = 28 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="1.5" y="1.5" width="29" height="29" rx="6" fill="#0a0f18" stroke="#22d3ee" strokeWidth="1.5" />
-      <path d="M8 22V10h10.5c2.6 0 4.5 1.7 4.5 4.1 0 1.7-1 3-2.5 3.6L23 22h-3.2l-2.3-4.1H11.2V22H8Zm3.2-6.6h6.6c1.2 0 2-.7 2-1.8s-.8-1.8-2-1.8h-6.6v3.6Z" fill="#22d3ee" />
-    </svg>
+    <span
+      aria-hidden="true"
+      className="inline-flex shrink-0 items-center justify-center rounded-md border border-volt bg-ink-950 font-mono font-bold text-volt"
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }}
+    >
+      CX
+    </span>
   );
 }
 

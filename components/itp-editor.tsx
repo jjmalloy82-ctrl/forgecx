@@ -1,7 +1,7 @@
 import { createItpItem, deleteItpItem, updateItpItem } from "@/lib/actions";
 import { ITP_RESULT_LABEL } from "@/lib/utils";
 import type { ItpItem } from "@/lib/types";
-import { ConfirmSubmit } from "./confirm-submit";
+import { ConfirmActionButton } from "./confirm-submit";
 import { ItpChip } from "./chips";
 
 export function ItpEditor({
@@ -53,14 +53,13 @@ export function ItpEditor({
                   Save row
                 </button>
                 <ItpChip value={item.result} />
-                <ConfirmSubmit
+                <ConfirmActionButton
                   action={deleteItpItem}
+                  fields={{ id: item.id }}
                   label="Delete"
                   confirm="Delete this ITP row?"
                   className="btn-danger text-xs"
-                >
-                  <input type="hidden" name="id" value={item.id} />
-                </ConfirmSubmit>
+                />
               </div>
             </form>
           ))

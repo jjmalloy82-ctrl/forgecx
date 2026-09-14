@@ -4,7 +4,7 @@ import type { PunchRow } from "@/lib/types";
 
 export function PunchEditForm({ punch }: { punch: PunchRow }) {
   return (
-    <form action={updatePunch} className="panel grid gap-4 p-5 md:grid-cols-2">
+    <form key={punch.updatedAt} action={updatePunch} className="panel grid gap-4 p-5 md:grid-cols-2">
       <input type="hidden" name="id" value={punch.id} />
       <label className="md:col-span-2">
         <span className="label">Title</span>

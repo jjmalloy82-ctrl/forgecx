@@ -117,7 +117,8 @@ export async function createPunch(formData: FormData) {
   const title = str(formData, "title");
   const description = str(formData, "description");
   const severity = (str(formData, "severity") || "B") as PunchSeverity;
-  const owner = str(formData, "owner") || "Unassigned";
+  const owner = str(formData, "owner");
+  if (!owner) throw new Error("Owner is required.");
   const dueDate = optDate(formData, "dueDate");
   const returnTo = str(formData, "returnTo") || "/app/punches";
   if (!projectId || !systemId || !title) throw new Error("Project, system, and title are required.");
