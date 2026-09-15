@@ -1,4 +1,4 @@
-import type { ItpItem, Project, Punch, System } from "./types";
+import type { IstGate, ItpItem, Project, Punch, System } from "./types";
 
 const T = {
   aug12: "2026-08-12T13:20:00.000Z",
@@ -611,5 +611,112 @@ export const SEED_ITP: ItpItem[] = [
     notes: "Blocked on A-punches CX-001, CX-008, CX-010, CX-015.",
     createdAt: T.sep14,
     updatedAt: T.sep14,
+  },
+];
+
+export const SEED_IST_COLUMBIANA: IstGate[] = [
+  {
+    id: "ist_col_01",
+    projectId: SEED_PROJECT.id,
+    stepNumber: 1,
+    title: "LOTO clear — isolation points restored, permits closed",
+    result: "pass",
+    notes: "CxA walkdown 12 Sep. Two leftover locks on CRAH-03 cleared.",
+    createdAt: T.sep12,
+    updatedAt: T.sep12,
+  },
+  {
+    id: "ist_col_02",
+    projectId: SEED_PROJECT.id,
+    stepNumber: 2,
+    title: "Protective relays tested (secondary injection)",
+    result: "pending",
+    notes: "Blocked on CX-009 trip settings. Eaton outage 15 Sep.",
+    createdAt: T.sep06,
+    updatedAt: T.sep12,
+  },
+  {
+    id: "ist_col_03",
+    projectId: SEED_PROJECT.id,
+    stepNumber: 3,
+    title: "Arc-flash labels applied on MDP cubicles",
+    result: "fail",
+    notes: "CX-008. AHJ will not witness IST without labels.",
+    createdAt: T.sep02,
+    updatedAt: T.sep11,
+  },
+  {
+    id: "ist_col_04",
+    projectId: SEED_PROJECT.id,
+    stepNumber: 4,
+    title: "UPS static bypass proven under inverter loss",
+    result: "fail",
+    notes: "CX-001. Vertiv on-site 15 Sep.",
+    createdAt: T.sep08,
+    updatedAt: T.sep13,
+  },
+  {
+    id: "ist_col_05",
+    projectId: SEED_PROJECT.id,
+    stepNumber: 5,
+    title: "Generator ATS sequence of operations proven",
+    result: "fail",
+    notes: "Test #2 failed. CX-010.",
+    createdAt: T.sep11,
+    updatedAt: T.sep14,
+  },
+  {
+    id: "ist_col_06",
+    projectId: SEED_PROJECT.id,
+    stepNumber: 6,
+    title: "EPO tested with AHJ present",
+    result: "pending",
+    notes: "Scheduled 18 Sep. CX-015.",
+    createdAt: T.sep10,
+    updatedAt: T.sep10,
+  },
+  {
+    id: "ist_col_07",
+    projectId: SEED_PROJECT.id,
+    stepNumber: 7,
+    title: "BMS critical alarms annunciate at NOC",
+    result: "pending",
+    notes: "NOC circuit not turned over. ITP-BMS-02 N/A.",
+    createdAt: T.sep12,
+    updatedAt: T.sep12,
+  },
+  {
+    id: "ist_col_08",
+    projectId: SEED_PROJECT.id,
+    stepNumber: 8,
+    title: "IST script / hold points approved by owner Cx",
+    result: "pending",
+    notes: "Draft in review. Cannot run until A-punches clear.",
+    createdAt: T.sep14,
+    updatedAt: T.sep14,
+  },
+];
+
+export const SEED_EVIDENCE_PHOTOS: { id: string; punchId: string; originalName: string; caption: string; stamp: string }[] = [
+  {
+    id: "ev_pnch002",
+    punchId: "pnch_002",
+    originalName: "CX-002-nameplate.svg",
+    caption: "UPS-A battery cabinet B-2 — replacement nameplate installed",
+    stamp: "8 Sep 2026 · J. Patel",
+  },
+  {
+    id: "ev_pnch012",
+    punchId: "pnch_012",
+    originalName: "CX-012-exhaust-flange.svg",
+    caption: "Generator-1 exhaust flex — dry after gasket swap",
+    stamp: "9 Sep 2026 · Cummins",
+  },
+  {
+    id: "ev_pnch017",
+    punchId: "pnch_017",
+    originalName: "CX-017-trip-unit.svg",
+    caption: "MDP spare 400A — correct LSI trip unit, torque 48 ft-lb",
+    stamp: "11 Sep 2026 · IR scan clean",
   },
 ];

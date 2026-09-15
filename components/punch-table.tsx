@@ -2,6 +2,7 @@ import { formatDate, isOverdue, punchCode } from "@/lib/utils";
 import type { PunchRow } from "@/lib/types";
 import Link from "next/link";
 import { PunchStatusChip, SeverityChip } from "./chips";
+import { EmptyState } from "./empty-state";
 
 export function PunchTable({
   punches,
@@ -12,9 +13,12 @@ export function PunchTable({
 }) {
   if (punches.length === 0) {
     return (
-      <div className="panel px-5 py-10 text-center text-sm text-ink-400">
-        No punches match this filter. Raise one from a system or the punch board.
-      </div>
+      <EmptyState
+        title="No punches in this view"
+        body="Raise one from a system or the punch board. Filters may be hiding open work."
+        actionHref="/app/punches"
+        actionLabel="Clear to punch board"
+      />
     );
   }
 

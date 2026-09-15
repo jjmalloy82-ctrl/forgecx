@@ -35,10 +35,10 @@ export default function LandingPage() {
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/app" className="btn-primary min-w-44">
-            Enter Columbiana DC
+            Enter the job board
           </Link>
-          <Link href="/app/punches" className="btn-ghost min-w-44">
-            Punch list
+          <Link href="/app/projects/prj_nantong" className="btn-ghost min-w-44">
+            Nantong Cogen
           </Link>
         </div>
 
@@ -47,7 +47,7 @@ export default function LandingPage() {
             {
               k: "01",
               t: "Punch discipline",
-              d: "Severity A/B/C, owner, due date, and evidence notes. Closing a punch without proof is not closing it.",
+              d: "Severity A/B/C, owner, due date, evidence notes, and field photos. Closing a punch without proof is not closing it.",
             },
             {
               k: "02",
@@ -56,8 +56,8 @@ export default function LandingPage() {
             },
             {
               k: "03",
-              t: "Export for the owner",
-              d: "CSV and print-ready punch lists for the AHJ, the owner Cx, and the 2 a.m. outage window.",
+              t: "IST gate + pilot pack",
+              d: "Energization hold points (LOTO, relays, sync checks) and a one-click HTML pack of open A/B punches plus ITP for the owner.",
             },
           ].map((item) => (
             <article key={item.k} className="panel p-5">
@@ -82,11 +82,11 @@ export default function LandingPage() {
             <div className="p-6">
               <h2 className="text-xl font-semibold text-white">What ships in this demo</h2>
               <ul className="mt-3 space-y-2 text-sm text-ink-300">
-                <li>— Seeded live job: Columbiana DC — Cx Phase</li>
-                <li>— 8 systems (UPS, CRAH, MDP, generator, BMS)</li>
-                <li>— ~20 punches mixed open / in progress / closed</li>
-                <li>— ITP rows with pass, fail, pending, N/A</li>
-                <li>— No login. Single-tenant. Built for a 72-hour iteration.</li>
+                <li>— Two seeded jobs: Columbiana DC (DataQuestCX) and Nantong Cogen (FQE Power)</li>
+                <li>— Punches, ITP, IST / energization gates, photo evidence</li>
+                <li>— One-click Pilot pack (open A/B + ITP + IST) per project</li>
+                <li>— CSV / print punch list · Reset restores both jobs</li>
+                <li>— No login. Single-tenant. 72-hour race cut.</li>
               </ul>
             </div>
           </div>

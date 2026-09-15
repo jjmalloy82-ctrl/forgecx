@@ -4,6 +4,7 @@ export type SystemStatus = "not_started" | "in_test" | "punch" | "accepted";
 export type PunchSeverity = "A" | "B" | "C";
 export type PunchStatus = "open" | "in_progress" | "closed";
 export type ItpResult = "pending" | "pass" | "fail" | "na";
+export type IstResult = "pending" | "pass" | "fail";
 
 export type Project = {
   id: string;
@@ -80,6 +81,29 @@ export type DashboardStats = {
   itpPending: number;
   itpPass: number;
   itpTotal: number;
+  istPending: number;
+  istFail: number;
+  istTotal: number;
+};
+
+export type IstGate = {
+  id: string;
+  projectId: string;
+  stepNumber: number;
+  title: string;
+  result: IstResult;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type EvidenceFile = {
+  id: string;
+  punchId: string;
+  originalName: string;
+  mime: string;
+  sizeBytes: number;
+  createdAt: string;
 };
 
 export type PunchFilters = {

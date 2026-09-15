@@ -12,7 +12,7 @@ export function ResetDemoButton() {
       className="btn-ghost text-xs"
       disabled={busy}
       onClick={async () => {
-        if (!confirm("Reset all data back to the Columbiana DC seed job?")) return;
+        if (!confirm("Reset all data to the demo: Columbiana DC (DataQuestCX) and Nantong Cogen (FQE Power)?")) return;
         setBusy(true);
         await resetDemoData();
       }}

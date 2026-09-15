@@ -67,6 +67,12 @@ export const ITP_RESULT_LABEL: Record<string, string> = {
   na: "N/A",
 };
 
+export const IST_RESULT_LABEL: Record<string, string> = {
+  pending: "Pending",
+  pass: "Pass",
+  fail: "Fail",
+};
+
 export const DISCIPLINES = [
   "Electrical",
   "Mechanical",

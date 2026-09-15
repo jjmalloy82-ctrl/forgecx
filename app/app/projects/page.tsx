@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/empty-state";
 import { ProjectForm } from "@/components/project-form";
 import { ProjectStatusChip, VerticalChip } from "@/components/chips";
 import { getDashboardStats, listProjects } from "@/lib/queries";
@@ -16,6 +17,12 @@ export default function ProjectsPage() {
         <p className="mt-2 text-sm text-ink-300">Create, rename, or open a commissioning job.</p>
       </div>
 
+      {projects.length === 0 ? (
+        <EmptyState
+          title="No projects yet"
+          body="Reset demo data to restore Columbiana DC and Nantong Cogen, or create a job below."
+        />
+      ) : (
       <div className="grid gap-4 md:grid-cols-2">
         {projects.map((p) => {
           const stats = getDashboardStats(p.id);
@@ -36,6 +43,7 @@ export default function ProjectsPage() {
           );
         })}
       </div>
+      )}
 
       <section>
         <h2 className="mb-3 text-lg font-semibold text-white">New project</h2>

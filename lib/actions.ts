@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { deleteEvidenceDisk, writeEvidenceBytes, assertImageFile, wipeEvidenceDir } from "./evidence";
 import { getDb, resetDatabase } from "./db";
-import { nextPunchNumber } from "./queries";
-import type { ItpResult, ProjectStatus, PunchSeverity, PunchStatus, SystemStatus, Vertical } from "./types";
+import { getEvidence, listEvidence, nextPunchNumber } from "./queries";
+import type { IstResult, ItpResult, ProjectStatus, PunchSeverity, PunchStatus, SystemStatus, Vertical } from "./types";
 import { nowIso, uid } from "./utils";
 
 function revalidateAll() {
@@ -60,6 +61,12 @@ export async function updateProject(formData: FormData) {
 
 export async function deleteProject(formData: FormData) {
   const id = str(formData, "id");
+  const punchIds = getDb()
+    .prepare("SELECT id FROM punches WHERE project_id = ?")
+    .all(id) as { id: string }[];
+  for (const p of punchIds) {
+    for (const f of listEvidence(p.id)) deleteEvidenceDisk(f);
+  }
   getDb().prepare("DELETE FROM projects WHERE id = ?").run(id);
   revalidateAll();
   redirect("/app/projects");
@@ -106,6 +113,12 @@ export async function updateSystem(formData: FormData) {
 export async function deleteSystem(formData: FormData) {
   const id = str(formData, "id");
   const projectId = str(formData, "projectId");
+  const punchIds = getDb()
+    .prepare("SELECT id FROM punches WHERE system_id = ?")
+    .all(id) as { id: string }[];
+  for (const p of punchIds) {
+    for (const f of listEvidence(p.id)) deleteEvidenceDisk(f);
+  }
   getDb().prepare("DELETE FROM systems WHERE id = ?").run(id);
   revalidateAll();
   redirect(`/app/projects/${projectId}`);
@@ -210,6 +223,8 @@ export async function setPunchStatus(formData: FormData) {
 export async function deletePunch(formData: FormData) {
   const id = str(formData, "id");
   const returnTo = str(formData, "returnTo") || "/app/punches";
+  const files = listEvidence(id);
+  for (const f of files) deleteEvidenceDisk(f);
   getDb().prepare("DELETE FROM punches WHERE id = ?").run(id);
   revalidateAll();
   redirect(returnTo);
@@ -259,7 +274,79 @@ export async function deleteItpItem(formData: FormData) {
   revalidateAll();
 }
 
+export async function updateIstGate(formData: FormData) {
+  const id = str(formData, "id");
+  const title = str(formData, "title");
+  const result = str(formData, "result") as IstResult;
+  const notes = str(formData, "notes");
+  const stepNumber = Number(str(formData, "stepNumber") || "1");
+  if (!id || !title) throw new Error("IST gate title is required.");
+
+  getDb()
+    .prepare(`UPDATE ist_gates SET title=?, result=?, notes=?, step_number=?, updated_at=? WHERE id=?`)
+    .run(title, result, notes, stepNumber, nowIso(), id);
+  revalidateAll();
+}
+
+export async function createIstGate(formData: FormData) {
+  const projectId = str(formData, "projectId");
+  const title = str(formData, "title");
+  if (!projectId || !title) throw new Error("IST gate title is required.");
+  const row = getDb()
+    .prepare("SELECT COALESCE(MAX(step_number), 0) + 1 AS n FROM ist_gates WHERE project_id = ?")
+    .get(projectId) as { n: number };
+  const id = uid("ist");
+  const ts = nowIso();
+  getDb()
+    .prepare(
+      `INSERT INTO ist_gates (id, project_id, step_number, title, result, notes, created_at, updated_at)
+       VALUES (?, ?, ?, ?, 'pending', '', ?, ?)`,
+    )
+    .run(id, projectId, row.n, title, ts, ts);
+  revalidateAll();
+}
+
+export async function deleteIstGate(formData: FormData) {
+  const id = str(formData, "id");
+  getDb().prepare("DELETE FROM ist_gates WHERE id = ?").run(id);
+  revalidateAll();
+}
+
+export async function attachEvidence(formData: FormData) {
+  const punchId = str(formData, "punchId");
+  if (!punchId) throw new Error("Missing punch.");
+  const punch = getDb().prepare("SELECT id FROM punches WHERE id = ?").get(punchId) as { id: string } | undefined;
+  if (!punch) throw new Error("Punch not found.");
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) throw new Error("Choose a photo to attach.");
+  const mime = file.type || "application/octet-stream";
+  assertImageFile(mime, file.size);
+  const bytes = Buffer.from(await file.arrayBuffer());
+  const id = uid("ev");
+  writeEvidenceBytes(id, mime, file.name, bytes);
+  getDb()
+    .prepare(
+      `INSERT INTO evidence_files (id, punch_id, original_name, mime, size_bytes, created_at)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    )
+    .run(id, punchId, file.name || "photo", mime, bytes.length, nowIso());
+  getDb().prepare("UPDATE punches SET updated_at=? WHERE id=?").run(nowIso(), punchId);
+  revalidateAll();
+}
+
+export async function deleteEvidence(formData: FormData) {
+  const id = str(formData, "id");
+  const row = getEvidence(id);
+  if (row) {
+    deleteEvidenceDisk(row);
+    getDb().prepare("DELETE FROM evidence_files WHERE id = ?").run(id);
+  }
+  revalidateAll();
+}
+
 export async function resetDemoData() {
+  wipeEvidenceDir();
   resetDatabase();
   revalidateAll();
   redirect("/app");

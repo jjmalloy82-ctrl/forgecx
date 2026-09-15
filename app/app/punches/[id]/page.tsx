@@ -1,8 +1,9 @@
 import { ConfirmSubmit } from "@/components/confirm-submit";
+import { EvidenceGallery } from "@/components/evidence-gallery";
 import { ClosePunchForm, PunchEditForm, ReopenPunchForm, StartPunchForm } from "@/components/punch-edit";
 import { PunchStatusChip, SeverityChip } from "@/components/chips";
 import { deletePunch } from "@/lib/actions";
-import { getPunch } from "@/lib/queries";
+import { getPunch, listEvidence } from "@/lib/queries";
 import { formatDate, isOverdue, punchCode } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -14,6 +15,7 @@ export default async function PunchDetailPage({ params }: { params: Promise<{ id
   const punch = getPunch(id);
   if (!punch) notFound();
   const overdue = isOverdue(punch.dueDate, punch.status);
+  const photos = listEvidence(punch.id);
 
   return (
     <div className="space-y-8">
@@ -49,7 +51,7 @@ export default async function PunchDetailPage({ params }: { params: Promise<{ id
             <ConfirmSubmit
               action={deletePunch}
               label="Delete"
-              confirm="Delete this punch?"
+              confirm="Delete this punch and its photo evidence?"
             >
               <input type="hidden" name="id" value={punch.id} />
               <input type="hidden" name="returnTo" value="/app/punches" />
@@ -67,13 +69,15 @@ export default async function PunchDetailPage({ params }: { params: Promise<{ id
 
       {punch.status !== "closed" ? <ClosePunchForm punchId={punch.id} /> : (
         <article className="panel p-5">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-emerald-300">Evidence on file</h2>
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-emerald-300">Evidence notes</h2>
           <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink-200">
             {punch.evidenceNotes || "Closed with no notes (legacy)."}
           </p>
           <p className="mt-3 font-mono text-xs text-ink-500">Closed {formatDate(punch.closedAt)}</p>
         </article>
       )}
+
+      <EvidenceGallery punchId={punch.id} files={photos} />
 
       <section>
         <h2 className="mb-3 text-lg font-semibold text-white">Edit punch</h2>

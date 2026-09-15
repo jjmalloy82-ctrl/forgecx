@@ -1,6 +1,8 @@
 import { getDb } from "./db";
 import type {
   DashboardStats,
+  EvidenceFile,
+  IstGate,
   ItpItem,
   Project,
   Punch,
@@ -285,6 +287,16 @@ export function getDashboardStats(projectId?: string): DashboardStats {
     )
     .get(...args) as { itp_total: number | null; itp_pending: number | null; itp_pass: number | null };
 
+  const istAgg = db
+    .prepare(
+      `SELECT
+        COUNT(*) AS ist_total,
+        SUM(CASE WHEN result = 'pending' THEN 1 ELSE 0 END) AS ist_pending,
+        SUM(CASE WHEN result = 'fail' THEN 1 ELSE 0 END) AS ist_fail
+       FROM ist_gates ${scope}`,
+    )
+    .get(...args) as { ist_total: number | null; ist_pending: number | null; ist_fail: number | null };
+
   const projectCount = projectId
     ? 1
     : (db.prepare("SELECT COUNT(*) AS c FROM projects").get() as { c: number }).c;
@@ -299,6 +311,9 @@ export function getDashboardStats(projectId?: string): DashboardStats {
     itpPending: itpAgg.itp_pending ?? 0,
     itpPass: itpAgg.itp_pass ?? 0,
     itpTotal: itpAgg.itp_total ?? 0,
+    istPending: istAgg.ist_pending ?? 0,
+    istFail: istAgg.ist_fail ?? 0,
+    istTotal: istAgg.ist_total ?? 0,
   };
 }
 
@@ -319,3 +334,91 @@ export function countPunchesBySeverity(projectId?: string) {
   for (const r of rows) map[r.severity] = r.c;
   return map;
 }
+
+type IstSql = {
+  id: string;
+  project_id: string;
+  step_number: number;
+  title: string;
+  result: IstGate["result"];
+  notes: string;
+  created_at: string;
+  updated_at: string;
+};
+
+function mapIst(r: IstSql): IstGate {
+  return {
+    id: r.id,
+    projectId: r.project_id,
+    stepNumber: r.step_number,
+    title: r.title,
+    result: r.result,
+    notes: r.notes,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+export function listIstGates(projectId: string): IstGate[] {
+  const rows = getDb()
+    .prepare("SELECT * FROM ist_gates WHERE project_id = ? ORDER BY step_number")
+    .all(projectId) as IstSql[];
+  return rows.map(mapIst);
+}
+
+export function listItpByProject(projectId: string): (ItpItem & { systemTag: string })[] {
+  const rows = getDb()
+    .prepare(
+      `SELECT i.*, s.tag AS system_tag
+       FROM itp_items i
+       JOIN systems s ON s.id = i.system_id
+       WHERE i.project_id = ?
+       ORDER BY s.tag COLLATE NOCASE, i.step_number`,
+    )
+    .all(projectId) as (ItpSql & { system_tag: string })[];
+  return rows.map((r) => ({ ...mapItp(r), systemTag: r.system_tag }));
+}
+
+type EvSql = {
+  id: string;
+  punch_id: string;
+  original_name: string;
+  mime: string;
+  size_bytes: number;
+  created_at: string;
+};
+
+function mapEvidence(r: EvSql): EvidenceFile {
+  return {
+    id: r.id,
+    punchId: r.punch_id,
+    originalName: r.original_name,
+    mime: r.mime,
+    sizeBytes: r.size_bytes,
+    createdAt: r.created_at,
+  };
+}
+
+export function listEvidence(punchId: string): EvidenceFile[] {
+  const rows = getDb()
+    .prepare("SELECT * FROM evidence_files WHERE punch_id = ? ORDER BY created_at")
+    .all(punchId) as EvSql[];
+  return rows.map(mapEvidence);
+}
+
+export function getEvidence(id: string): EvidenceFile | null {
+  const row = getDb().prepare("SELECT * FROM evidence_files WHERE id = ?").get(id) as EvSql | undefined;
+  return row ? mapEvidence(row) : null;
+}
+
+export function listEvidenceForProject(projectId: string): EvidenceFile[] {
+  const rows = getDb()
+    .prepare(
+      `SELECT e.* FROM evidence_files e
+       JOIN punches p ON p.id = e.punch_id
+       WHERE p.project_id = ?`,
+    )
+    .all(projectId) as EvSql[];
+  return rows.map(mapEvidence);
+}
+

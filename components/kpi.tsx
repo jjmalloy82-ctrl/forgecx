@@ -23,11 +23,17 @@ export function Kpi({
 export function KpiGrid({ stats }: { stats: DashboardStats }) {
   const itpPct = stats.itpTotal === 0 ? 0 : Math.round(((stats.itpTotal - stats.itpPending) / stats.itpTotal) * 100);
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
       <Kpi label="Open punches" value={stats.openPunches} hint={`${stats.inProgress} in progress`} />
       <Kpi label="A-deficiencies" value={stats.aOpen} hint="COD / safety blockers" alert={stats.aOpen > 0} />
       <Kpi label="Overdue" value={stats.overdue} hint="Past due and still open" alert={stats.overdue > 0} />
       <Kpi label="ITP complete" value={`${itpPct}%`} hint={`${stats.itpPass} pass · ${stats.itpPending} pending`} />
+      <Kpi
+        label="IST / energization"
+        value={stats.istFail}
+        hint={`${stats.istFail} fail · ${stats.istPending} pending of ${stats.istTotal}`}
+        alert={stats.istFail > 0}
+      />
     </div>
   );
 }

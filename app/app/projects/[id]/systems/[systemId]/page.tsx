@@ -42,7 +42,7 @@ export default async function SystemDetailPage({
           <ConfirmSubmit
             action={deleteSystem}
             label="Delete system"
-            confirm="Delete this system, its punches, and ITP rows?"
+            confirm="Delete this system, its punches, ITP rows, and photo evidence?"
           >
             <input type="hidden" name="id" value={system.id} />
             <input type="hidden" name="projectId" value={id} />
